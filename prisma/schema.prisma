@@ -1,0 +1,185 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  image       String?
+  type        String    // "ladies" or "gents"
+  items       String[]  // Array of category items
+  active      Boolean   @default(true) // Soft delete flag
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+
+  @@index([type])
+  @@index([active])
+}
+
+model Product {
+  id              Int       @id @default(autoincrement())
+  name            String
+  description     String
+  fullDescription String?   @db.Text
+  price           String    // e.g., "PKR 1,200/meter"
+  originalPrice   String?
+  image           String
+  images          String[]  // Array of additional images
+  categoryId      Int
+  category        Category  @relation(fields: [categoryId], references: [id])
+  type            String    // "ladies" or "gents"
+  inStock         Boolean   @default(true)
+  stockQuantity   Int?
+  material        String?
+  width           String?
+  weight          String?
+  care            String?
+  origin          String?
+  colors          String[]  // Array of available colors
+  sizes           String[]  // Array of available sizes
+  features        String[]  // Array of product features
+  rating          Float?
+  reviews         Int?
+  featured        Boolean   @default(false) // For featured products
+  active          Boolean   @default(true) // Soft delete flag
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([categoryId])
+  @@index([type])
+  @@index([active])
+  @@index([featured])
+}
+
+model Order {
+  id              Int       @id @default(autoincrement())
+  orderNumber     String    @unique
+  customerName    String
+  customerPhone   String
+  customerAddress String    @db.Text
+  city            String
+  postalCode      String?
+  deliveryNotes   String?   @db.Text
+  paymentMethod   String    // "online" or "cod"
+  status          String    @default("pending") // pending, confirmed, processing, shipped, delivered, cancelled
+  totalAmount     Float
+  items           Json      // Array of order items
+  active          Boolean   @default(true) // Soft delete flag
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([orderNumber])
+  @@index([status])
+  @@index([active])
+  @@index([createdAt])
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  password  String
+  type      String   @default("employee") // "admin" or "employee"
+  active    Boolean  @default(true) // Soft delete flag
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([type])
+  @@index([active])
+}
+
+model Section {
+  id          Int       @id @default(autoincrement())
+  type        String    // "ladies" or "gents"
+  title       String
+  description String?   @db.Text
+  image       String    // Path to uploaded image
+  items       String[]  // Array of section items
+  active      Boolean   @default(true) // Soft delete flag
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([type])
+  @@index([type])
+  @@index([active])
+}
+
+model BankDetails {
+  id            Int      @id @default(autoincrement())
+  bankName      String   @default("Habib Bank Limited")
+  accountNumber String
+  accountTitle  String
+  iban          String?
+  swiftCode     String?
+  branchName    String?
+  branchAddress String? @db.Text
+  contactPhone  String?
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([active])
+}
+
+model StoreInfo {
+  id            Int      @id @default(autoincrement())
+  title         String
+  description   String?  @db.Text
+  image         String?  // Path to uploaded image
+  location      String
+  contactPhone  String
+  email         String?  // Contact email
+  storeHours    String?  @db.Text // Store hours as text (e.g., "Mon - Sat: 10:00 AM - 9:00 PM\nSunday: 11:00 AM - 7:00 PM")
+  facebookUrl   String?  // Facebook page URL
+  instagramUrl  String?  // Instagram profile URL
+  tiktokUrl     String?  // TikTok profile URL
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([active])
+}
+
+model AboutPage {
+  id            Int      @id @default(autoincrement())
+  pageTitle     String   @default("About Shahzad Fabrics")
+  pageSubtitle  String?  @db.Text
+  storyTitle    String   @default("Our Story")
+  storyContent  String?  @db.Text // Story paragraphs separated by newlines
+  valuesTitle   String   @default("Our Values")
+  value1Title   String?  @default("Quality First")
+  value1Content String?  @db.Text
+  value2Title   String?  @default("Customer Service")
+  value2Content String?  @db.Text
+  value3Title   String?  @default("Trust & Integrity")
+  value3Content String?  @db.Text
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([active])
+}
+
+model Owner {
+  id          Int      @id @default(autoincrement())
+  name        String
+  image       String?  // Path to uploaded image
+  description String?  @db.Text
+  order       Int      @default(0) // For ordering owners
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([active])
+  @@index([order])
+}
