@@ -13,6 +13,8 @@ interface OrderItem {
   quantity: number
   category: string
   type: string
+  selectedColor?: string
+  selectedSize?: string
 }
 
 interface Order {
@@ -234,20 +236,45 @@ export default function OrdersPage() {
                       <div className="space-y-2">
                         {Array.isArray(order.items) && order.items.map((item: OrderItem, idx: number) => (
                           <div key={idx} className="flex items-center justify-between p-2 bg-secondary/30 rounded">
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
                               <img
                                 src={item.image || "/placeholder.svg"}
                                 alt={item.name}
-                                className="w-12 h-12 object-cover rounded"
+                                className="w-12 h-12 object-cover rounded flex-shrink-0"
                               />
-                              <div>
+                              <div className="flex-1 min-w-0">
                                 <p className="font-medium text-sm">{item.name}</p>
                                 <p className="text-xs text-muted-foreground">
                                   {item.category} • Qty: {item.quantity}
                                 </p>
+                                {/* Selected Color */}
+                                {item.selectedColor && (
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <span className="text-xs text-muted-foreground">Color:</span>
+                                    {/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(item.selectedColor) ? (
+                                      <div className="flex items-center gap-1.5">
+                                        <div
+                                          className="w-3 h-3 rounded-full border border-border flex-shrink-0"
+                                          style={{ backgroundColor: item.selectedColor }}
+                                          title={item.selectedColor}
+                                        />
+                                        <span className="text-xs font-mono">{item.selectedColor.toUpperCase()}</span>
+                                      </div>
+                                    ) : (
+                                      <span className="text-xs">{item.selectedColor}</span>
+                                    )}
+                                  </div>
+                                )}
+                                {/* Selected Size */}
+                                {item.selectedSize && (
+                                  <div className="flex items-center gap-2 mt-0.5">
+                                    <span className="text-xs text-muted-foreground">Size:</span>
+                                    <span className="text-xs font-medium">{item.selectedSize}</span>
+                                  </div>
+                                )}
                               </div>
                             </div>
-                            <p className="font-medium">{item.price}</p>
+                            <p className="font-medium ml-2 flex-shrink-0">{item.price}</p>
                           </div>
                         ))}
                       </div>

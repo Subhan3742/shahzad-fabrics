@@ -82,13 +82,15 @@ export default function CartPage() {
             <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
               {/* Cart Items */}
               <div className="lg:col-span-2 space-y-3 sm:space-y-4">
-                {items.map((item) => {
+                {items.map((item, index) => {
                   const priceMatch = item.price.match(/[\d,]+/)
                   const itemPrice = priceMatch ? parseFloat(priceMatch[0].replace(/,/g, "")) : 0
                   const itemTotal = itemPrice * item.quantity
+                  // Create unique key for items with same id but different color/size
+                  const uniqueKey = `${item.id}-${item.selectedColor || 'no-color'}-${item.selectedSize || 'no-size'}-${index}`
 
                   return (
-                    <Card key={item.id}>
+                    <Card key={uniqueKey}>
                       <CardContent className="p-3 sm:p-4 md:p-6">
                         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6">
                           {/* Product Image */}
@@ -107,12 +109,38 @@ export default function CartPage() {
                                 <h3 className="font-semibold text-base sm:text-lg text-foreground mb-1 line-clamp-2">{item.name}</h3>
                                 <p className="text-xs sm:text-sm text-muted-foreground">{item.category}</p>
                                 <p className="text-xs sm:text-sm text-muted-foreground capitalize">{item.type}</p>
+                                {/* Selected Color */}
+                                {item.selectedColor && (
+                                  <div className="flex items-center gap-2 mt-2">
+                                    <span className="text-xs text-muted-foreground">Color:</span>
+                                    {/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(item.selectedColor) ? (
+                                      <div className="flex items-center gap-2">
+                                        <div
+                                          className="w-4 h-4 rounded-full border border-border"
+                                          style={{ backgroundColor: item.selectedColor }}
+                                          title={item.selectedColor}
+                                        />
+                                        <span className="text-xs font-mono">{item.selectedColor.toUpperCase()}</span>
+                                      </div>
+                                    ) : (
+                                      <span className="text-xs">{item.selectedColor}</span>
+                                    )}
+                                  </div>
+                                )}
+                                {/* Selected Size */}
+                                {item.selectedSize && (
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <span className="text-xs text-muted-foreground">Size:</span>
+                                    <span className="text-xs font-medium">{item.selectedSize}</span>
+                                  </div>
+                                )}
                               </div>
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => removeFromCart(item.id)}
+                                onClick={() => removeFromCart(item.id, item.selectedColor, item.selectedSize)}
                                 className="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10"
+                                title="Remove item"
                               >
                                 <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                               </Button>
@@ -124,7 +152,7 @@ export default function CartPage() {
                                 <Button
                                   variant="outline"
                                   size="icon"
-                                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                  onClick={() => updateQuantity(item.id, item.quantity - 1, item.selectedColor, item.selectedSize)}
                                   className="h-8 w-8 sm:h-9 sm:w-9"
                                 >
                                   <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -133,7 +161,7 @@ export default function CartPage() {
                                 <Button
                                   variant="outline"
                                   size="icon"
-                                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                  onClick={() => updateQuantity(item.id, item.quantity + 1, item.selectedColor, item.selectedSize)}
                                   className="h-8 w-8 sm:h-9 sm:w-9"
                                 >
                                   <Plus className="h-3 w-3 sm:h-4 sm:w-4" />

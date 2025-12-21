@@ -10,13 +10,15 @@ export interface CartItem {
   quantity: number
   category: string
   type: "ladies" | "gents"
+  selectedColor?: string
+  selectedSize?: string
 }
 
 interface CartContextType {
   items: CartItem[]
   addToCart: (item: Omit<CartItem, "quantity">) => void
-  removeFromCart: (id: number) => void
-  updateQuantity: (id: number, quantity: number) => void
+  removeFromCart: (id: number, selectedColor?: string, selectedSize?: string) => void
+  updateQuantity: (id: number, quantity: number, selectedColor?: string, selectedSize?: string) => void
   clearCart: () => void
   getTotalItems: () => number
   getTotalPrice: () => number
@@ -46,27 +48,48 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addToCart = (item: Omit<CartItem, "quantity">) => {
     setItems((prevItems) => {
-      const existingItem = prevItems.find((i) => i.id === item.id)
+      // Check if same item with same color/size exists
+      const existingItem = prevItems.find((i) => 
+        i.id === item.id && 
+        i.selectedColor === item.selectedColor && 
+        i.selectedSize === item.selectedSize
+      )
       if (existingItem) {
         return prevItems.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          i.id === item.id && 
+          i.selectedColor === item.selectedColor && 
+          i.selectedSize === item.selectedSize
+            ? { ...i, quantity: i.quantity + 1 } 
+            : i
         )
       }
       return [...prevItems, { ...item, quantity: 1 }]
     })
   }
 
-  const removeFromCart = (id: number) => {
-    setItems((prevItems) => prevItems.filter((i) => i.id !== id))
+  const removeFromCart = (id: number, selectedColor?: string, selectedSize?: string) => {
+    setItems((prevItems) => 
+      prevItems.filter((i) => 
+        !(i.id === id && 
+          i.selectedColor === selectedColor && 
+          i.selectedSize === selectedSize)
+      )
+    )
   }
 
-  const updateQuantity = (id: number, quantity: number) => {
+  const updateQuantity = (id: number, quantity: number, selectedColor?: string, selectedSize?: string) => {
     if (quantity <= 0) {
-      removeFromCart(id)
+      removeFromCart(id, selectedColor, selectedSize)
       return
     }
     setItems((prevItems) =>
-      prevItems.map((i) => (i.id === id ? { ...i, quantity } : i))
+      prevItems.map((i) => 
+        i.id === id && 
+        i.selectedColor === selectedColor && 
+        i.selectedSize === selectedSize
+          ? { ...i, quantity } 
+          : i
+      )
     )
   }
 

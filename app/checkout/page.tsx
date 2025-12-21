@@ -103,6 +103,8 @@ export default function CheckoutPage() {
         quantity: item.quantity,
         category: item.category,
         type: item.type,
+        selectedColor: item.selectedColor || null,
+        selectedSize: item.selectedSize || null,
       }))
 
       // Save order to database
@@ -495,11 +497,35 @@ export default function CheckoutPage() {
                           const priceMatch = item.price.match(/[\d,]+/)
                           const itemPrice = priceMatch ? parseFloat(priceMatch[0].replace(/,/g, "")) : 0
                           return (
-                            <div key={item.id} className="flex justify-between text-sm">
-                              <span className="text-muted-foreground">
-                                {item.name} x{item.quantity}
-                              </span>
-                              <span className="font-medium">{formatPrice(itemPrice * item.quantity)}</span>
+                            <div key={item.id} className="space-y-1">
+                              <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">
+                                  {item.name} x{item.quantity}
+                                </span>
+                                <span className="font-medium">{formatPrice(itemPrice * item.quantity)}</span>
+                              </div>
+                              {item.selectedColor && (
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground ml-2">
+                                  <span>Color:</span>
+                                  {/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(item.selectedColor) ? (
+                                    <>
+                                      <div
+                                        className="w-3 h-3 rounded-full border border-border"
+                                        style={{ backgroundColor: item.selectedColor }}
+                                        title={item.selectedColor}
+                                      />
+                                      <span className="font-mono">{item.selectedColor.toUpperCase()}</span>
+                                    </>
+                                  ) : (
+                                    <span>{item.selectedColor}</span>
+                                  )}
+                                </div>
+                              )}
+                              {item.selectedSize && (
+                                <div className="text-xs text-muted-foreground ml-2">
+                                  Size: <span className="font-medium">{item.selectedSize}</span>
+                                </div>
+                              )}
                             </div>
                           )
                         })}

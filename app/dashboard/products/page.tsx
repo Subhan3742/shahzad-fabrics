@@ -73,7 +73,7 @@ export default function ProductsPage() {
     featured: false,
     active: true,
   })
-  const [newColor, setNewColor] = useState("")
+  const [newColor, setNewColor] = useState("#000000")
   const [newSize, setNewSize] = useState("")
   const [newFeature, setNewFeature] = useState("")
   const [newImage, setNewImage] = useState("")
@@ -256,19 +256,21 @@ export default function ProductsPage() {
     })
     setEditingId(null)
     setShowForm(false)
-    setNewColor("")
+    setNewColor("#000000")
     setNewSize("")
     setNewFeature("")
     setNewImage("")
   }
 
   const addColor = () => {
-    if (newColor.trim()) {
+    if (newColor && newColor.trim()) {
+      // Store color as hex value
+      const colorValue = newColor.startsWith('#') ? newColor : `#${newColor}`
       setFormData({
         ...formData,
-        colors: [...formData.colors, newColor.trim()],
+        colors: [...formData.colors, colorValue],
       })
-      setNewColor("")
+      setNewColor("#000000")
     }
   }
 
@@ -668,32 +670,61 @@ export default function ProductsPage() {
               <div>
                 <Label>Colors</Label>
                 <div className="flex gap-2 mb-2">
-                  <Input
-                    value={newColor}
-                    onChange={(e) => setNewColor(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addColor())}
-                    placeholder="Add color"
-                  />
+                  <div className="flex-1 relative">
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={newColor}
+                        onChange={(e) => setNewColor(e.target.value)}
+                        className="h-10 w-20 rounded-md border border-input cursor-pointer"
+                        title="Select color"
+                      />
+                      <Input
+                        type="text"
+                        value={newColor}
+                        onChange={(e) => setNewColor(e.target.value)}
+                        onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addColor())}
+                        placeholder="#000000"
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
                   <Button type="button" onClick={addColor}>
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {formData.colors.map((color, idx) => (
-                    <span
-                      key={idx}
-                      className="px-3 py-1 bg-primary/80 text-primary-foreground rounded-full text-xs font-medium flex items-center gap-2"
-                    >
-                      {color}
-                      <button
-                        type="button"
-                        onClick={() => removeColor(idx)}
-                        className="hover:text-destructive"
+                  {formData.colors.map((color, idx) => {
+                    // Try to parse as hex color, fallback to text if invalid
+                    const isValidHex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color)
+                    return (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 px-3 py-1 border border-border rounded-md bg-background"
                       >
-                        ×
-                      </button>
-                    </span>
-                  ))}
+                        {isValidHex ? (
+                          <>
+                            <div
+                              className="w-6 h-6 rounded border border-border"
+                              style={{ backgroundColor: color }}
+                              title={color}
+                            />
+                            <span className="text-xs font-mono">{color.toUpperCase()}</span>
+                          </>
+                        ) : (
+                          <span className="text-xs">{color}</span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removeColor(idx)}
+                          className="hover:text-destructive text-lg leading-none"
+                          title="Remove color"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
 

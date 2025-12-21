@@ -43,8 +43,16 @@ interface ProductDetailClientProps {
 export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const { addToCart } = useCart()
   const [addedToCart, setAddedToCart] = useState(false)
+  const [selectedColor, setSelectedColor] = useState<string>("")
+  const [selectedSize, setSelectedSize] = useState<string>("")
 
   const handleAddToCart = () => {
+    // Require color selection if colors are available
+    if (product.colors && product.colors.length > 0 && !selectedColor) {
+      alert("Please select a color before adding to cart")
+      return
+    }
+
     addToCart({
       id: product.id,
       name: product.name,
@@ -52,6 +60,8 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       image: product.image,
       category: product.category,
       type: product.type,
+      selectedColor: selectedColor || undefined,
+      selectedSize: selectedSize || undefined,
     })
     setAddedToCart(true)
     setTimeout(() => setAddedToCart(false), 2000)
@@ -144,16 +154,78 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 {/* Colors */}
                 {product.colors && product.colors.length > 0 && (
                   <div className="mb-6">
-                    <h3 className="font-semibold text-foreground mb-3">Available Colors:</h3>
+                    <h3 className="font-semibold text-foreground mb-3">
+                      Select Color: <span className="text-sm font-normal text-muted-foreground">(Required)</span>
+                    </h3>
+                    <div className="flex flex-wrap gap-3">
+                      {product.colors.map((color) => {
+                        // Check if color is a valid hex code
+                        const isValidHex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color)
+                        const isSelected = selectedColor === color
+                        return (
+                          <div
+                            key={color}
+                            className="flex flex-col items-center gap-2 group cursor-pointer"
+                            onClick={() => setSelectedColor(color)}
+                          >
+                            <div
+                              className={`w-12 h-12 rounded-full border-2 shadow-md hover:shadow-lg transition-all group-hover:scale-110 ${
+                                isSelected 
+                                  ? 'border-primary ring-2 ring-primary ring-offset-2' 
+                                  : 'border-border'
+                              }`}
+                              style={{ backgroundColor: isValidHex ? color : '#cccccc' }}
+                              title={color}
+                            />
+                            {isValidHex ? (
+                              <span className={`text-xs font-mono ${
+                                isSelected ? 'text-primary font-semibold' : 'text-muted-foreground'
+                              }`}>
+                                {color.toUpperCase()}
+                              </span>
+                            ) : (
+                              <span className={`text-xs text-center max-w-[60px] truncate ${
+                                isSelected ? 'text-primary font-semibold' : 'text-muted-foreground'
+                              }`}>
+                                {color}
+                              </span>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                    {selectedColor && (
+                      <p className="text-sm text-primary mt-2">
+                        ✓ Selected: {/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(selectedColor) 
+                          ? selectedColor.toUpperCase() 
+                          : selectedColor}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Sizes */}
+                {product.sizes && product.sizes.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="font-semibold text-foreground mb-3">Select Size (Optional):</h3>
                     <div className="flex flex-wrap gap-2">
-                      {product.colors.map((color) => (
-                        <span
-                          key={color}
-                          className="px-4 py-2 border border-border rounded-md text-sm bg-background hover:bg-accent/50 transition-colors"
-                        >
-                          {color}
-                        </span>
-                      ))}
+                      {product.sizes.map((size) => {
+                        const isSelected = selectedSize === size
+                        return (
+                          <button
+                            key={size}
+                            type="button"
+                            onClick={() => setSelectedSize(size)}
+                            className={`px-4 py-2 border rounded-md text-sm transition-all ${
+                              isSelected
+                                ? 'border-primary bg-primary text-primary-foreground'
+                                : 'border-border bg-background hover:bg-accent'
+                            }`}
+                          >
+                            {size}
+                          </button>
+                        )
+                      })}
                     </div>
                   </div>
                 )}
