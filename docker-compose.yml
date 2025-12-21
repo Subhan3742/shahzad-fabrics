@@ -1,0 +1,41 @@
+services:
+  master-node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      network: host
+      args:
+        ENV: ${ENV}
+        PORT: ${PORT}
+    image: ${DOCKER_NAME}:latest
+    container_name: ${DOCKER_NAME}
+    restart: always
+    network_mode: host
+    environment:
+      - NODE_ENV=production
+      - ENV=${ENV}
+      - PORT=${PORT}
+      - HOSTNAME=0.0.0.0
+    volumes:
+      - /var/www/public/shahzad-fabrics:/var/www/public/shahzad-fabrics
+    command: ["node", "server.js"]
+  backup-node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      network: host
+      args:
+        ENV: ${ENV}
+        PORT: ${PORT}
+    image: ${DOCKER_NAME}-backup:latest
+    container_name: ${DOCKER_NAME}-backup
+    restart: always
+    network_mode: host
+    environment:
+      - NODE_ENV=production
+      - ENV=${ENV}
+      - PORT=${PORT}
+      - HOSTNAME=0.0.0.0
+    volumes:
+      - /var/www/public/shahzad-fabrics:/var/www/public/shahzad-fabrics
+    command: ["node", "server.js"]
