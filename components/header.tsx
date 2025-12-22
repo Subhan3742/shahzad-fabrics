@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Menu, X, ShoppingBag, Phone } from "lucide-react"
+import { Menu, X, ShoppingBag, Phone, LogIn } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { useCart } from "@/contexts/cart-context"
+import { useSession } from "next-auth/react"
 import Image from "next/image"
 
 export function Header() {
@@ -13,6 +14,7 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { getTotalItems } = useCart()
   const cartItemsCount = getTotalItems()
+  const { data: session } = useSession()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -81,6 +83,20 @@ export function Header() {
                 )}
               </Button>
             </Link>
+            {session ? (
+              <Link href="/dashboard">
+                <Button variant="outline" className="bg-background">
+                  Dashboard
+                </Button>
+              </Link>
+            ) : (
+              <Link href="/login">
+                <Button variant="outline" className="bg-background">
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Login
+                </Button>
+              </Link>
+            )}
             <Button 
               className="bg-primary text-primary-foreground hover:bg-primary/90"
               onClick={handleWhatsAppClick}
@@ -122,6 +138,21 @@ export function Header() {
                     )}
                   </Button>
                 </Link>
+                {session ? (
+                  <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full bg-background border-2 hover:bg-secondary/50 transition-all py-6">
+                      <LogIn className="h-5 w-5 mr-2" />
+                      <span className="text-base font-medium">Dashboard</span>
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full bg-background border-2 hover:bg-secondary/50 transition-all py-6">
+                      <LogIn className="h-5 w-5 mr-2" />
+                      <span className="text-base font-medium">Login</span>
+                    </Button>
+                  </Link>
+                )}
                 <Button 
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all py-6 shadow-lg"
                   onClick={handleWhatsAppClick}

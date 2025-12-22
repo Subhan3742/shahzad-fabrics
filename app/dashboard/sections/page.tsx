@@ -49,10 +49,25 @@ export default function SectionsPage() {
   const [editingImage, setEditingImage] = useState<{ file: File; type: "ladies" | "gents" } | null>(null)
 
   useEffect(() => {
-    if (session?.user?.type !== "admin") {
+    // Wait for session to load
+    if (session === undefined) {
+      // Session is still loading
+      return
+    }
+    
+    // If no session, middleware should redirect, but check anyway
+    if (!session) {
+      router.push("/login")
+      return
+    }
+    
+    // Check if user is admin
+    if (session.user?.type !== "admin") {
       router.push("/dashboard")
       return
     }
+    
+    // User is admin, fetch sections
     fetchSections()
   }, [session, router])
 
@@ -272,12 +287,23 @@ export default function SectionsPage() {
     }
   }
 
-  if (session?.user?.type !== "admin") {
-    return <div>Access denied. Admin only.</div>
+  // Show loading while session is being checked
+  if (session === undefined) {
+    return <div className="flex items-center justify-center min-h-[400px]">Loading...</div>
+  }
+
+  // If no session, show access denied (middleware should have redirected)
+  if (!session) {
+    return <div className="flex items-center justify-center min-h-[400px]">Access denied. Please login.</div>
+  }
+
+  // Check if user is admin
+  if (session.user?.type !== "admin") {
+    return <div className="flex items-center justify-center min-h-[400px]">Access denied. Admin only.</div>
   }
 
   if (loading) {
-    return <div>Loading sections...</div>
+    return <div className="flex items-center justify-center min-h-[400px]">Loading sections...</div>
   }
 
   const ladiesSection = sections.find((s) => s.type === "ladies")
