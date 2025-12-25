@@ -83,20 +83,7 @@ export function Header() {
                 )}
               </Button>
             </Link>
-            {session ? (
-              <Link href="/dashboard">
-                <Button variant="outline" className="bg-background">
-                  Dashboard
-                </Button>
-              </Link>
-            ) : (
-              <Link href="/login">
-                <Button variant="outline" className="bg-background">
-                  <LogIn className="h-4 w-4 mr-2" />
-                  Login
-                </Button>
-              </Link>
-            )}
+           
             <Button 
               className="bg-primary text-primary-foreground hover:bg-primary/90"
               onClick={handleWhatsAppClick}
