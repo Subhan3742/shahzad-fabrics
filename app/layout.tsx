@@ -21,28 +21,16 @@ export const metadata: Metadata = {
   title: "Shahzad Fabrics Brand's Shop - Premium Fabrics in Lahore",
   description:
     "Discover premium quality fabrics for ladies and gents at Shahzad Fabrics Brand's Shop. Located at 26-Hajvery Center, Ichra Road, Lahore.",
-  generator: "v0.app",
   icons: {
     icon: [
-      {
-        url: "/favicon-shahzad.ico",
-        type: "image/x-icon",
-      },
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
+      { url: "/favicon-shahzad.ico", type: "image/x-icon" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
-    apple: "/apple-icon.png",
+    apple: "/apple-touch-icon.png",
+    shortcut: "/favicon-shahzad.ico",
   },
+  manifest: "/manifest.json",
 }
 
 export default function RootLayout({
