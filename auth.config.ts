@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials"
 
 export const authConfig = {
   secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || "default-secret-change-in-production",
+  trustHost: true,
   providers: [
     Credentials({
       credentials: {
