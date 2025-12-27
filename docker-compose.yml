@@ -18,6 +18,7 @@ services:
       - HOSTNAME=0.0.0.0
     volumes:
       - /var/www/public/shahzad-fabrics:/var/www/public/shahzad-fabrics
+      - /var/www/public/shahzad-fabrics/uploads:/app/public/uploads
     command: ["node", "server.js"]
   backup-node:
     build:
@@ -38,4 +39,5 @@ services:
       - HOSTNAME=0.0.0.0
     volumes:
       - /var/www/public/shahzad-fabrics:/var/www/public/shahzad-fabrics
+      - /var/www/public/shahzad-fabrics/uploads:/app/public/uploads
     command: ["node", "server.js"]

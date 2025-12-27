@@ -4,10 +4,12 @@ import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
 
-// External image server URL (for live site)
-const IMAGE_BASE_URL = 'https://image.futuredevsolutions.com/shahzad-fabrics'
+// Image configuration
+// Set to true to use external image server, false for local storage
+const USE_EXTERNAL_IMAGE_SERVER = false
 
-// Upload path on live server
+// External image server settings (when USE_EXTERNAL_IMAGE_SERVER = true)
+const IMAGE_BASE_URL = 'https://image.futuredevsolutions.com/shahzad-fabrics'
 const IMAGE_UPLOAD_PATH = '/var/www/public/shahzad-fabrics'
 
 export async function POST(request: NextRequest) {
@@ -60,8 +62,10 @@ export async function POST(request: NextRequest) {
     const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
     const filename = `${timestamp}-${originalName}`
 
-    // Upload directory on live server
-    const uploadsDir = join(IMAGE_UPLOAD_PATH, 'uploads', folder)
+    // Determine upload directory based on configuration
+    const uploadsDir = USE_EXTERNAL_IMAGE_SERVER
+      ? join(IMAGE_UPLOAD_PATH, 'uploads', folder)
+      : join(process.cwd(), 'public', 'uploads', folder)
     
     if (!existsSync(uploadsDir)) {
       await mkdir(uploadsDir, { recursive: true })
@@ -71,8 +75,10 @@ export async function POST(request: NextRequest) {
     const filepath = join(uploadsDir, filename)
     await writeFile(filepath, buffer)
 
-    // Return the external image URL
-    const publicUrl = `${IMAGE_BASE_URL}/uploads/${folder}/${filename}`
+    // Return URL based on configuration
+    const publicUrl = USE_EXTERNAL_IMAGE_SERVER
+      ? `${IMAGE_BASE_URL}/uploads/${folder}/${filename}`
+      : `/uploads/${folder}/${filename}`
 
     return NextResponse.json({ url: publicUrl }, { status: 200 })
   } catch (error) {
