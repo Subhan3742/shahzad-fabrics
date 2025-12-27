@@ -5,13 +5,8 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
-// Generate static params for static export
-export function generateStaticParams() {
-  return [
-    { type: "ladies" },
-    { type: "gents" },
-  ]
-}
+// Force dynamic rendering - fetch fresh data on every request
+export const dynamic = 'force-dynamic'
 
 // Direct Prisma call for server components (better performance)
 import { prisma } from '@/lib/prisma'

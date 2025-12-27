@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button"
 import { ProductDetailClient } from "./product-detail-client"
 import Link from "next/link"
 
-// Note: generateStaticParams removed - pages will be generated dynamically
-// This allows new products to be accessible immediately without rebuild
+// Force dynamic rendering - fetch fresh data on every request
+export const dynamic = 'force-dynamic'
 
 // Direct Prisma call for server components (better performance)
 import { prisma } from '@/lib/prisma'
