@@ -4,6 +4,12 @@ import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
 
+// External image server URL (for live site)
+const IMAGE_BASE_URL = 'https://image.futuredevsolutions.com/shahzad-fabrics'
+
+// Upload path on live server
+const IMAGE_UPLOAD_PATH = '/var/www/public/shahzad-fabrics'
+
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
@@ -54,8 +60,9 @@ export async function POST(request: NextRequest) {
     const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
     const filename = `${timestamp}-${originalName}`
 
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), 'public', 'uploads', folder)
+    // Upload directory on live server
+    const uploadsDir = join(IMAGE_UPLOAD_PATH, 'uploads', folder)
+    
     if (!existsSync(uploadsDir)) {
       await mkdir(uploadsDir, { recursive: true })
     }
@@ -64,8 +71,8 @@ export async function POST(request: NextRequest) {
     const filepath = join(uploadsDir, filename)
     await writeFile(filepath, buffer)
 
-    // Return the public URL
-    const publicUrl = `/uploads/${folder}/${filename}`
+    // Return the external image URL
+    const publicUrl = `${IMAGE_BASE_URL}/uploads/${folder}/${filename}`
 
     return NextResponse.json({ url: publicUrl }, { status: 200 })
   } catch (error) {
